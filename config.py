@@ -9,18 +9,18 @@ class Config:
     BOT_SESSION = environ.get("BOT_SESSION", "forward-bot") 
     DATABASE_URI = environ.get("DATABASE", "mongodb+srv://ftm:ftm@cluster0.9a4gw2t.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
     DATABASE_NAME = environ.get("DATABASE_NAME", "forward-bot")
-    OWNER_ID_STR = environ.get("OWNER_ID", "7744665378 7810783444")
+    OWNER_ID_STR = environ.get("OWNER_ID", "7744665378")
     
     # Validate required environment variables
     @classmethod
     def validate_env(cls):
         """Validate that all required environment variables are set"""
-        required_vars = ['API_ID', 'API_HASH', 'BOT_TOKEN', 'DATABASE', 'OWNER_ID']
+        required_vars = ['API_ID', 'API_HASH', 'BOT_TOKEN', 'OWNER_ID']
         missing_vars = []
         
         for var in required_vars:
-            if not environ.get(var):
-                missing_vars.append(var)
+            if not getattr(cls, var, None):
+               missing_vars.append(var)
         
         if missing_vars:
             print(f"❌ Missing required environment variables: {', '.join(missing_vars)}")
