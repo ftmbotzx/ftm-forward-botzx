@@ -446,6 +446,17 @@ async def handle_chat_messages(update: Update, context: CallbackContext) -> None
     user_id = update.effective_user.id
     message = update.message
     
+    # Check if user is in an active configuration session
+    # Import here to avoid circular imports
+    try:
+        from plugins.test import waiting_messages
+        if user_id in waiting_messages:
+            logger.info(f"ℹ️ User {user_id} is in configuration session, skipping PTB handler")
+            return  # Let Pyrogram settings module handle this message
+    except ImportError:
+        # If waiting_messages not available, continue with chat handling
+        pass
+    
     logger.info(f"📨 PTB Message received from user {user_id} for chat forwarding")
     
     try:
