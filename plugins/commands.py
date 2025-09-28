@@ -35,7 +35,7 @@ def get_main_buttons():
         InlineKeyboardButton('💁‍♂️ ᴀʙᴏᴜᴛ ', callback_data='about'),
         InlineKeyboardButton('⚙️ sᴇᴛᴛɪɴɢs ⚙️', callback_data='settings#main')
         ],[
-        InlineKeyboardButton('📞 Contact Admin', callback_data='contact_admin')
+        InlineKeyboardButton('💬 Contact Admin', url='https://t.me/ftmdeveloperzbot')
         ]]
 
 
@@ -248,14 +248,14 @@ async def start(client, message):
             # Notify about new user
             notify = NotificationManager(client)
             await notify.notify_user_action(user.id, "New User Registration", f"User: {user.first_name}")
-            
+
         # Handle referral tracking for users with referral code
         if referral_code:
             logger.info(f"Processing referral code {referral_code} for user {user.id} (new_user: {is_new_user})")
-            
+
             # Only set up referral for new users or existing users without referral
             user_data = await db.get_user(user.id)
-            
+
             if not user_data or not user_data.get('referred_by'):
                 try:
                     # Check if referring user exists
@@ -265,7 +265,7 @@ async def start(client, message):
                         referral_success = await db.set_user_referred_by(user.id, referral_code)
                         if referral_success:
                             logger.info(f"✅ Referral tracking successfully set up for user {user.id} via {referral_code}")
-                            
+
                             # Mark referral bot started
                             await db.mark_referral_bot_started(user.id)
                             logger.info(f"Marked referral bot started for user {user.id}")
@@ -281,7 +281,7 @@ async def start(client, message):
                             logger.error(f"❌ Failed to set referral tracking for user {user.id} via {referral_code}")
                     else:
                         logger.warning(f"❌ No user found with referral code {referral_code} - cannot set up referral for user {user.id}")
-                        
+
                 except Exception as referral_error:
                     logger.error(f"Error processing referral for user {user.id}: {referral_error}")
             else:
@@ -296,7 +296,7 @@ async def start(client, message):
                 # Grant unlimited premium to sudo users (expires in 10 years)
                 await db.add_premium_user(user.id, "pro", 3650, 0)
                 logger.info(f"Auto-granted premium to sudo user: {user.id}")
-            
+
             # Handle referral completion for sudo users who came via referral
             # Since sudo users skip force subscribe, we need to complete their referrals here
             user_data = await db.get_user(user.id)
@@ -304,14 +304,14 @@ async def start(client, message):
                 logger.info(f"Completing referral for sudo user {user.id}")
                 await db.mark_referral_bot_started(user.id)
                 referral_result = await db.mark_referral_channels_joined(user.id)
-                
+
                 # If referral was completed, send notifications
                 if referral_result and isinstance(referral_result, dict) and referral_result.get('completed'):
                     try:
                         from .fsub import _send_referral_completion_notifications
                         await _send_referral_completion_notifications(
-                            client, 
-                            referral_result['referrer_user_id'], 
+                            client,
+                            referral_result['referrer_user_id'],
                             referral_result['referred_user_id'],
                             referral_result['total_referrals'],
                             referral_result['reward_granted']
@@ -346,14 +346,14 @@ async def start(client, message):
                     # Mark bot started and channels joined, then complete referral
                     await db.mark_referral_bot_started(user.id)
                     referral_result = await db.mark_referral_channels_joined(user.id)
-                    
+
                     # If referral was completed, send notifications
                     if referral_result and isinstance(referral_result, dict) and referral_result.get('completed'):
                         try:
                             from .fsub import _send_referral_completion_notifications
                             await _send_referral_completion_notifications(
-                                client, 
-                                referral_result['referrer_user_id'], 
+                                client,
+                                referral_result['referrer_user_id'],
                                 referral_result['referred_user_id'],
                                 referral_result['total_referrals'],
                                 referral_result['reward_granted']
@@ -361,7 +361,7 @@ async def start(client, message):
                             logger.info(f"Referral completion notifications sent for already subscribed user {user.id}")
                         except Exception as e:
                             logger.error(f"Error sending referral completion notifications for already subscribed user: {e}")
-                            
+
         # Handle referral completion for users who joined via referral and are already subscribed
         if not Config.is_sudo_user(user.id) and Config.MULTI_FSUB:
             subscription_status = await db.check_force_subscribe(user.id, client)
@@ -373,14 +373,14 @@ async def start(client, message):
                     logger.info(f"User {user.id} already subscribed to all channels, completing existing referral")
                     await db.mark_referral_bot_started(user.id)
                     referral_result = await db.mark_referral_channels_joined(user.id)
-                    
+
                     # If referral was completed, send notifications
                     if referral_result and isinstance(referral_result, dict) and referral_result.get('completed'):
                         try:
                             from .fsub import _send_referral_completion_notifications
                             await _send_referral_completion_notifications(
-                                client, 
-                                referral_result['referrer_user_id'], 
+                                client,
+                                referral_result['referrer_user_id'],
                                 referral_result['referred_user_id'],
                                 referral_result['total_referrals'],
                                 referral_result['reward_granted']
@@ -388,7 +388,7 @@ async def start(client, message):
                             logger.info(f"Referral completion notifications sent for already subscribed user {user.id}")
                         except Exception as e:
                             logger.error(f"Error sending referral completion notifications for already subscribed user: {e}")
-                
+
                 # Also handle new referral setup if they came with a referral code
                 elif referral_code and user_data and not user_data.get('referred_by'):
                     try:
@@ -399,18 +399,18 @@ async def start(client, message):
                             referral_success = await db.set_user_referred_by(user.id, referral_code)
                             if referral_success:
                                 logger.info(f"✅ Set up referral for already subscribed user {user.id} via {referral_code}")
-                                
+
                                 # Immediately mark as completed since they're already subscribed
                                 await db.mark_referral_bot_started(user.id)
                                 referral_result = await db.mark_referral_channels_joined(user.id)
-                                
+
                                 # Send notifications
                                 if referral_result and isinstance(referral_result, dict) and referral_result.get('completed'):
                                     try:
                                         from .fsub import _send_referral_completion_notifications
                                         await _send_referral_completion_notifications(
-                                            client, 
-                                            referral_result['referrer_user_id'], 
+                                            client,
+                                            referral_result['referrer_user_id'],
                                             referral_result['referred_user_id'],
                                             referral_result['total_referrals'],
                                             referral_result['reward_granted']
@@ -558,7 +558,7 @@ async def help_command(client, message):
             InlineKeyboardButton('⚙️ Settings ⚙️', callback_data='settings#main'),
             InlineKeyboardButton('📊 Stats 📊', callback_data='status')
         ],[
-            InlineKeyboardButton('💬 Contact Admin', callback_data='contact_admin')
+            InlineKeyboardButton('💬 Contact Admin', url='https://t.me/ftmdeveloperzbot')
         ]]
 
         # Add admin commands button for admins only
@@ -608,7 +608,7 @@ async def helpcb(bot, query):
             InlineKeyboardButton('⚙️ Settings ⚙️', callback_data='settings#main'),
             InlineKeyboardButton('📊 Stats 📊', callback_data='status')
         ],[
-            InlineKeyboardButton('💬 Contact Admin', callback_data='contact_admin')
+            InlineKeyboardButton('💬 Contact Admin', url='https://t.me/ftmdeveloperzbot')
         ]]
 
         # Add admin commands button for admins only
@@ -1284,7 +1284,7 @@ async def admin_speedtest_callback(bot, query):
 └ <b>Share URL:</b> <a href="{st.results.share()}">View Results</a>"""
 
         await status_msg.edit_text(
-            text=speed_text, 
+            text=speed_text,
             disable_web_page_preview=True,
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton('🔙 Back to Admin', callback_data='admin_commands')
@@ -1637,7 +1637,7 @@ async def premium_info_callback(bot, query):
             text=Translation.PLAN_INFO_MSG,
             reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton('📊 Check My Plan', callback_data='my_plan')],
-                [InlineKeyboardButton('💬 Contact Admin', callback_data='contact_admin')],
+                [InlineKeyboardButton('💬 Contact Admin', url='https://t.me/ftmdeveloperzbot')],
                 [InlineKeyboardButton('🔙 Back to Menu', callback_data='back')]
             ])
         )
@@ -1768,7 +1768,7 @@ async def my_plan_callback(bot, query):
         buttons.extend([
             [
                 InlineKeyboardButton('🔗 Referral System', callback_data='refresh_referral'),
-                InlineKeyboardButton('💬 Contact Admin', callback_data='contact_admin')
+                InlineKeyboardButton('💬 Contact Admin', url='https://t.me/ftmdeveloperzbot')
             ],
             [InlineKeyboardButton('🔙 Back to Menu', callback_data='back')]
         ])
