@@ -200,7 +200,7 @@ async def pub_(bot, message):
     
     await send(client, user, "<b>𝙵𝙾𝚁𝚆𝙰𝚁𝙳𝙸𝙽𝙶 𝚂𝚃𝙰𝚁𝚃𝙴𝙳 𝙱𝚈 <a href=https://t.me/ftmdeveloper>𝙵𝚃𝙼 𝙳𝙴𝚅𝙴𝙻𝙾𝙿𝙴𝚁</a></b>")
     sts.add(time=True)
-    sleep = 1.5  # Optimized sleep time for both bots and userbots
+    sleep = Config.MESSAGE_DELAY  # Configurable delay from config.py
     await msg_edit(m, "<code>Processing...</code>") 
     temp.IS_FRWD_CHAT.append(i.TO)
     temp.lock[user] = locked = True
@@ -278,7 +278,7 @@ async def pub_(bot, message):
                       ftm_mode = configs.get('ftm_mode', False) and user_can_use_ftm
                       # Forward returns True/False, count is handled internally
                       await forward(client, MSG, m, sts, protect, ftm_mode, _bot['is_bot'])
-                      await asyncio.sleep(1.5)
+                      await asyncio.sleep(Config.MESSAGE_DELAY)
                       MSG = []
                 else:
                    # Handle text messages vs media messages differently
