@@ -39,7 +39,7 @@ async def buy_plan_callback(client, callback_query):
     buttons = [
         [
             InlineKeyboardButton("📋 Copy UPI ID", callback_data="copy_upi"),
-            InlineKeyboardButton("💬 Contact Support", callback_data="contact_admin")
+            InlineKeyboardButton("💬 Contact Admin", url='https://t.me/ftmdeveloperzbot')
         ],
         [
             InlineKeyboardButton("🔙 Back to Plans", callback_data="premium_plans")
@@ -344,8 +344,6 @@ async def handle_chat_messages(client, message):
     from plugins.test import waiting_messages
     if user_id in waiting_messages:
         return  # Let the settings module handle this message
-
-# Contact command moved to plugins/chat.py
 
 # Chat request accept/deny callbacks
 @Client.on_callback_query(filters.regex(r'^accept_chat_'))
@@ -960,118 +958,6 @@ async def chat_user_callback(client, callback_query):
 @Client.on_callback_query(filters.regex(r'^copy_upi$'))
 async def copy_upi_callback(client, callback_query):
     await callback_query.answer(f"📋 UPI ID: {Config.UPI_ID}", show_alert=True)
-
-# Referral command handler - REMOVED: Duplicate of plugins/referral.py
-# This was causing force subscription checks before referral access
-# The enhanced referral system is now handled entirely in plugins/referral.py
-# @Client.on_message(filters.private & filters.command(['referral']))
-# async def referral_command(client, message):
-#     user_id = message.from_user.id
-#     user_name = message.from_user.first_name
-#
-#     # Force subscribe check
-#     try:
-#         is_subscribed = await client.get_chat_member(Config.CHANNEL_ID, user_id)
-#         if is_subscribed.status in [enums.ChatMemberStatus.LEFT, enums.ChatMemberStatus.BANNED]:
-#             await message.reply_text(
-#                 "<b>❌ You are not subscribed to our channel!</b>\n\n"
-#                 "<b>Please join our channel to use the referral system.</b>\n\n"
-#                 f"<b>Channel:</b> {Config.CHANNEL_LINK}"
-#             )
-#             return
-#     except Exception as e:
-#         print(f"Error checking channel subscription: {e}")
-#         await message.reply_text(
-#             "<b>❌ Error checking subscription status. Please try again later.</b>"
-#         )
-#         return
-#
-#     # Generate referral link
-#     referral_link = f"https://t.me/{Config.BOT_USERNAME}?start=ref_{user_id}"
-#
-#     # Referral stats
-#     referrals = await db.get_referral_count(user_id)
-#     total_earned = await db.get_total_referral_earnings(user_id)
-#
-#     referral_text = f"""
-#     <b>✨ Welcome to the Referral Program, {user_name}! ✨</b>
-#
-#     <b>🚀 Your Unique Referral Link:</b>
-#     <code>{referral_link}</code>
-#
-#     <b>🔗 Share this link with your friends and earn rewards!</b>
-#
-#     <b>📊 Your Referral Stats:</b>
-#     • <b>Total Referrals:</b> {referrals}
-#     • <b>Total Earned:</b> ₹{total_earned:.2f}
-#
-#     <b>🎁 Rewards:</b>
-#     • Earn ₹{Config.REFERRAL_REWARD_PER_USER:.2f} for each successful referral!
-#     • Get your referral to subscribe to any plan to get rewarded.
-#
-#     <b>📜 Rules:</b>
-#     • Fake referrals will be ignored.
-#     • Only genuine users who subscribe to a plan will be counted.
-#
-#     <b>💡 Tip:</b> Share your link in groups and with friends who might find our bot useful!
-#     """
-#     await message.reply_text(referral_text)
-
-# Callback for refreshing referral stats - REMOVED: Duplicate of plugins/referral.py
-# This was causing force subscription checks before referral callback access
-# The enhanced referral system callbacks are now handled entirely in plugins/referral.py
-# @Client.on_callback_query(filters.regex(r'^refresh_referral$'))
-# async def refresh_referral_callback(client, callback_query):
-#     user_id = callback_query.from_user.id
-#     user_name = callback_query.from_user.first_name
-#
-#     # Force subscribe check
-#     try:
-#         is_subscribed = await client.get_chat_member(Config.CHANNEL_ID, user_id)
-#         if is_subscribed.status in [enums.ChatMemberStatus.LEFT, enums.ChatMemberStatus.BANNED]:
-#             await callback_query.answer(
-#                 "❌ You are not subscribed to our channel! Please join to access referral features.",
-#                 show_alert=True
-#             )
-#             return
-#     except Exception as e:
-#         print(f"Error checking channel subscription: {e}")
-#         await callback_query.answer("❌ Error checking subscription status. Please try again later.", show_alert=True)
-#         return
-#
-#     # Generate referral link
-#     referral_link = f"https://t.me/{Config.BOT_USERNAME}?start=ref_{user_id}"
-#
-#     # Referral stats
-#     referrals = await db.get_referral_count(user_id)
-#     total_earned = await db.get_total_referral_earnings(user_id)
-#
-#     referral_text = f"""
-#     <b>✨ Welcome to the Referral Program, {user_name}! ✨</b>
-#
-#     <b>🚀 Your Unique Referral Link:</b>
-#     <code>{referral_link}</code>
-#
-#     <b>🔗 Share this link with your friends and earn rewards!</b>
-#
-#     <b>📊 Your Referral Stats:</b>
-#     • <b>Total Referrals:</b> {referrals}
-#     • <b>Total Earned:</b> ₹{total_earned:.2f}
-#
-#     <b>🎁 Rewards:</b>
-#     • Earn ₹{Config.REFERRAL_REWARD_PER_USER:.2f} for each successful referral!
-#     • Get your referral to subscribe to any plan to get rewarded.
-#
-#     <b>📜 Rules:</b>
-#     • Fake referrals will be ignored.
-#     • Only genuine users who subscribe to a plan will be counted.
-#
-#     <b>💡 Tip:</b> Share your link in groups and with friends who might find our bot useful!
-#     """
-#
-#     # Edit the message to show updated referral stats
-#     await callback_query.message.edit_text(referral_text)
-#     await callback_query.answer("✅ Referral stats refreshed!")
 
 # Callback for premium plans
 @Client.on_callback_query(filters.regex(r'^premium_plans$'))
