@@ -28,8 +28,7 @@ async def settings(client: Client, message):
    await message.delete()
    await message.reply_text(
      Translation.SETTINGS_MAIN_MSG,
-     reply_markup=main_buttons()
-     )
+     reply_markup=main_buttons())
 
 @Client.on_callback_query(filters.regex(r'^settings'))
 async def settings_callback(bot: Client, query):
@@ -54,7 +53,7 @@ async def settings_callback(bot: Client, query):
       i, type = query.data.split("#", 1)
   except ValueError:
       type = "main"
-  
+
   buttons = [[InlineKeyboardButton('↩ Back', callback_data="settings#main")]]
 
   if type=="main":
@@ -294,23 +293,23 @@ async def settings_callback(bot: Client, query):
      text = None
      try:
          text = await bot.send_message(user_id, "Send your custom caption\n\n<b>Available variables:</b>\n- <code>{filename}</code> - File name\n- <code>{size}</code> - File size\n- <code>{caption}</code> - Original caption\n\n/cancel - <code>cancel this process</code>")
-         
+
          client_instance = CLIENT()
          caption_msg = await client_instance._wait_for_message(bot, user_id, timeout=300)
-         
+
          if not caption_msg:
             return await text.edit_text(
                   "<b>⏰ Time out! Process cancelled.</b>",
                   reply_markup=InlineKeyboardMarkup(buttons))
-         
+
          if caption_msg.text == "/cancel":
             await caption_msg.delete()
             return await text.edit_text(
                   "<b>process canceled !</b>",
                   reply_markup=InlineKeyboardMarkup(buttons))
-         
+
          caption_text = caption_msg.text.strip()
-         
+
          # Validate caption format
          try:
             # Test if caption format is valid with sample data
@@ -325,7 +324,7 @@ async def settings_callback(bot: Client, query):
             return await text.edit_text(
                f"<b>❌ Invalid caption format: {str(e)}</b>",
                reply_markup=InlineKeyboardMarkup(buttons))
-         
+
          # Save the caption
          await update_configs(user_id, 'caption', caption_text)
          await caption_msg.delete()
@@ -358,33 +357,33 @@ async def settings_callback(bot: Client, query):
      txt = None
      try:
          txt = await bot.send_message(user_id, text="**Send your custom button.**\n\n<b>FORMAT:</b>\n<code>[Button Text][buttonurl:URL]</code>\n\n<b>EXAMPLE:</b>\n<code>[ftmbotzx][buttonurl:https://t.me/ftmbotzx]</code>\n\n<b>For usernames:</b>\n<code>[ftmbotzx][buttonurl:ftmbotzx]</code>\n\n<b>Multiple Buttons (each on new line):</b>\n<code>[Button 1][buttonurl:https://t.me/channel1]\n[Button 2][buttonurl:https://t.me/channel2]</code>\n\n/cancel - cancel this process")
-         
+
          client_instance = CLIENT()
          ask = await client_instance._wait_for_message(bot, user_id, timeout=300)
-         
+
          if not ask:
             return await txt.edit_text("**⏰ Time out! Process cancelled.**",
                reply_markup=InlineKeyboardMarkup(buttons))
-         
+
          if ask.text == '/cancel':
             await ask.delete()
             return await txt.edit_text("**Process canceled**",
                reply_markup=InlineKeyboardMarkup(buttons))
-         
+
          # Validate button text
          if not ask.text or not ask.text.strip():
             await ask.delete()
             return await txt.edit_text("**❌ Please send a valid button format.**",
                reply_markup=InlineKeyboardMarkup(buttons))
-         
+
          button_text = ask.text.strip()
-         
+
          # Basic format validation
          if '[' not in button_text or ']' not in button_text or 'buttonurl:' not in button_text.lower():
             await ask.delete()
             return await txt.edit_text("**❌ Invalid format!**\n\n<b>Use this format:</b>\n<code>[Button Name][buttonurl:URL/username]</code>\n\n<b>Example:</b>\n<code>[ftmbotzx][buttonurl:ftmbotzx]</code>",
                reply_markup=InlineKeyboardMarkup(buttons))
-         
+
          # Try to parse buttons to validate format
          try:
             test_buttons = parse_buttons(button_text, markup=False)
@@ -396,7 +395,7 @@ async def settings_callback(bot: Client, query):
             await ask.delete()
             return await txt.edit_text(f"**❌ Button parsing error: {str(parse_error)}**",
                reply_markup=InlineKeyboardMarkup(buttons))
-         
+
          # Save the button configuration
          await update_configs(user_id, 'button', button_text)
          await ask.delete()
@@ -530,14 +529,14 @@ async def settings_callback(bot: Client, query):
            return await text.edit_text(
                       "<b>Process canceled</b>",
                       reply_markup=InlineKeyboardMarkup(buttons))
-        
+
         # More permissive validation
         if not ext.text or not ext.text.strip():
             await ext.delete()
             return await text.edit_text(
                 "<b>Please send valid extensions.</b>",
                 reply_markup=InlineKeyboardMarkup(buttons))
-        
+
         new_extensions = []
         for extn in ext.text.split():
             extn = extn.strip().lower()
@@ -548,15 +547,15 @@ async def settings_callback(bot: Client, query):
                 # Basic validation - just check it's not empty after dot
                 if len(extn) > 1:
                     new_extensions.append(extn)
-        
+
         if not new_extensions:
             await ext.delete()
             return await text.edit_text(
                 "<b>No valid extensions found! Try: mp4 pdf zip</b>",
                 reply_markup=InlineKeyboardMarkup(buttons))
-        
+
         current_extensions = (await get_configs(user_id))['extension']
-        
+
         if current_extensions and isinstance(current_extensions, list):
             for extn in new_extensions:
                 if extn not in current_extensions:  # Avoid duplicates
@@ -564,7 +563,7 @@ async def settings_callback(bot: Client, query):
             final_extensions = current_extensions
         else:
             final_extensions = new_extensions
-        
+
         await update_configs(user_id, 'extension', final_extensions)
         await ext.delete()
         await text.edit_text(
@@ -599,29 +598,29 @@ async def settings_callback(bot: Client, query):
            return await text.edit_text(
                       "<b>Process canceled</b>",
                       reply_markup=InlineKeyboardMarkup(buttons))
-        
+
         # More permissive validation
         if not ask.text or not ask.text.strip():
             await ask.delete()
             return await text.edit_text(
                 "<b>Please send valid keywords.</b>",
                 reply_markup=InlineKeyboardMarkup(buttons))
-        
+
         # Less strict validation - just split by space and clean
         new_keywords = []
         for word in ask.text.split():
             word = word.strip()
             if word and len(word) >= 1:  # Allow even single character keywords
                 new_keywords.append(word)
-        
+
         if not new_keywords:
             await ask.delete()
             return await text.edit_text(
                 "<b>No keywords found! Try: movie songs</b>",
                 reply_markup=InlineKeyboardMarkup(buttons))
-        
+
         current_keywords = (await get_configs(user_id))['keywords']
-        
+
         if current_keywords and isinstance(current_keywords, list):
             for word in new_keywords:
                 if word.lower() not in [k.lower() for k in current_keywords]:  # Avoid duplicates
@@ -629,7 +628,7 @@ async def settings_callback(bot: Client, query):
             final_keywords = current_keywords
         else:
             final_keywords = new_keywords
-        
+
         await update_configs(user_id, 'keywords', final_keywords)
         await ask.delete()
         await text.edit_text(
@@ -868,7 +867,8 @@ def main_buttons():
        InlineKeyboardButton('Exᴛʀᴀ Sᴇᴛᴛɪɴɢs 🧪',
                     callback_data='settings#nextfilters')
        ],[
-       InlineKeyboardButton('⫷ Bᴀᴄᴋ', callback_data='help')
+       InlineKeyboardButton('⫷ Bᴀᴄᴋ', callback_data='help'),
+       InlineKeyboardButton('💬 Contact Admin', url='https://t.me/ftmdeveloperzbot')
        ]]
   return InlineKeyboardMarkup(buttons)
 
