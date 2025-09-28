@@ -41,7 +41,7 @@ class Config:
     # UPI ID for payments
     UPI_ID = environ.get("UPI_ID", "6354228145@axl")
     CHANNEL_ID=MULTI_FSUB_STR
-    MESSAGE_DELAY = float(environ.get("MESSAGE_DELAY", "2.5"))
+    MESSAGE_DELAY = float(environ.get("MESSAGE_DELAY", "1.8"))
     # Three-tier pricing structure
     PLAN_PRICING = {
         'plus': {
