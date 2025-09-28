@@ -23,61 +23,24 @@ logger.setLevel(logging.INFO)
 TEXT = Translation.TEXT
 
 def safe_decode_caption(caption_data):
-    """
-    Safely decode caption data that might be in various encodings including UTF-16-LE.
-    
-    Args:
-        caption_data: The caption data from Pyrogram (could be string, bytes, or None)
-        
-    Returns:
-        str: Properly decoded UTF-8 string, or empty string if decoding fails
-    """
     if not caption_data:
         return ""
-    
-    # If it's already a string, ensure it's clean UTF-8
+
     if isinstance(caption_data, str):
-        try:
-            # Encode and decode to ensure clean UTF-8
-            return caption_data.encode('utf-8', errors='ignore').decode('utf-8')
-        except Exception:
-            return ""
-    
-    # If it's bytes, try multiple encoding methods
+        return caption_data.encode("utf-8", errors="ignore").decode("utf-8").strip()
+
     if isinstance(caption_data, bytes):
-        # List of encodings to try, in order of preference
-        encodings_to_try = [
-            'utf-8',
-            'utf-16-le',  # Handle the specific UTF-16-LE encoding issue
-            'utf-16-be',
-            'utf-16',
-            'latin-1',
-            'cp1252'
-        ]
-        
+        encodings_to_try = ["utf-8", "latin-1", "cp1252"]
         for encoding in encodings_to_try:
             try:
-                decoded = caption_data.decode(encoding, errors='strict')
-                # Additional validation: ensure the decoded string is reasonable
-                if decoded and len(decoded) > 0:
-                    # Clean up any potential null bytes or control characters
-                    cleaned = decoded.replace('\x00', '').strip()
-                    if cleaned:
-                        return cleaned
-            except (UnicodeDecodeError, UnicodeError):
+                decoded = caption_data.decode(encoding, errors="strict")
+                if decoded:
+                    return decoded.replace("\x00", "").strip()
+            except UnicodeDecodeError:
                 continue
-        
-        # If all encodings fail, try with error handling
-        try:
-            return caption_data.decode('utf-8', errors='replace').replace('\ufffd', '').strip()
-        except Exception:
-            return ""
-    
-    # Fallback for any other type
-    try:
-        return str(caption_data).encode('utf-8', errors='ignore').decode('utf-8')
-    except Exception:
-        return ""
+        return caption_data.decode("utf-8", errors="replace").replace("\ufffd", "").strip()
+
+    return str(caption_data)
 
 @Client.on_callback_query(filters.regex(r'^start_public'))
 async def pub_(bot, message):
