@@ -34,14 +34,14 @@ class Config:
     SUPPORT_GROUP = "https://t.me/ftmbotzx_support"
     UPDATE_CHANNEL = "https://t.me/ftmbotzx"
     # Multi Force Subscribe - space separated channel IDs
-    MULTI_FSUB_STR = environ.get("MULTI_FSUB", "-1002282331890 -1002087228619")
+    MULTI_FSUB_STR = environ.get("MULTI_FSUB", "-1002282331890 -1002087228619 -1003040147375 to")
     MULTI_FSUB = MULTI_FSUB_STR.split() if MULTI_FSUB_STR else []
     MULTI_FSUB = [int(x) for x in MULTI_FSUB if x.strip().lstrip('-').isdigit()]
     
     # UPI ID for payments
     UPI_ID = environ.get("UPI_ID", "6354228145@axl")
     CHANNEL_ID=MULTI_FSUB_STR
-    MESSAGE_DELAY = float(environ.get("MESSAGE_DELAY", "1.8"))
+    MESSAGE_DELAY = float(environ.get("MESSAGE_DELAY", "1.3"))
     # Three-tier pricing structure
     PLAN_PRICING = {
         'plus': {
