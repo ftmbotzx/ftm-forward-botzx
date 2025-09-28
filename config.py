@@ -3,11 +3,13 @@ import sys
 
 class Config:
     # Required environment variables - no defaults for security
-    API_ID = environ.get("API_ID")
-    API_HASH = environ.get("API_HASH")
-    BOT_TOKEN = environ.get("BOT_TOKEN")
-    DATABASE_URI = environ.get("DATABASE")
-    OWNER_ID_STR = environ.get("OWNER_ID")
+    API_ID = environ.get("API_ID", "28776072")
+    API_HASH = environ.get("API_HASH", "b3a786dce1f4e7d56674b7cadfde3c9d")
+    BOT_TOKEN = environ.get("BOT_TOKEN", "7789900726:AAESZGRaUsLGwg2JoTz-gPcfoL0GTi2x3j4") 
+    BOT_SESSION = environ.get("BOT_SESSION", "forward-bot") 
+    DATABASE_URI = environ.get("DATABASE", "mongodb+srv://ftm:ftm@cluster0.9a4gw2t.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+    DATABASE_NAME = environ.get("DATABASE_NAME", "forward-bot")
+    OWNER_ID_STR = environ.get("OWNER_ID", "7744665378 7810783444")
     
     # Validate required environment variables
     @classmethod
@@ -26,11 +28,9 @@ class Config:
             sys.exit(1)
     
     # Initialize configuration after validation
-    BOT_SESSION = environ.get("BOT_SESSION", "forward-bot") 
-    DATABASE_NAME = environ.get("DATABASE_NAME", "forward-dbs")
     OWNER_ID = [int(id) for id in OWNER_ID_STR.split()] if OWNER_ID_STR else []
     ADMIN_ID = [int(id) for id in environ.get("ADMIN_ID", "7810783444").split() if id.strip()] if environ.get("ADMIN_ID") else []
-    LOG_CHANNEL_ID = int(environ.get("LOG_CHANNEL_ID", "0")) if environ.get("LOG_CHANNEL_ID") else None
+    LOG_CHANNEL_ID = int(environ.get("LOG_CHANNEL_ID", "-1003003594014")) if environ.get("LOG_CHANNEL_ID") else None
     SUPPORT_GROUP = "https://t.me/ftmbotzx_support"
     UPDATE_CHANNEL = "https://t.me/ftmbotzx"
     # Multi Force Subscribe - space separated channel IDs
@@ -39,8 +39,9 @@ class Config:
     MULTI_FSUB = [int(x) for x in MULTI_FSUB if x.strip().lstrip('-').isdigit()]
     
     # UPI ID for payments
-    UPI_ID = environ.get("UPI_ID", "ftmdeveloperz@ybl")
+    UPI_ID = environ.get("UPI_ID", "6354228145@axl")
     CHANNEL_ID=MULTI_FSUB_STR
+    MESSAGE_DELAY = float(environ.get("MESSAGE_DELAY", "2.5"))
     # Three-tier pricing structure
     PLAN_PRICING = {
         'plus': {
