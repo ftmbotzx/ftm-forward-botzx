@@ -22,25 +22,23 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 TEXT = Translation.TEXT
 
-def safe_decode_caption(caption_data):
-    if not caption_data:
+def safe_decode_caption(caption) -> str:
+    if not caption:
         return ""
 
-    if isinstance(caption_data, str):
-        return caption_data.encode("utf-8", errors="ignore").decode("utf-8").strip()
+    try:
+        if isinstance(caption, bytes):
+            return caption.decode("utf-8", errors="ignore")
 
-    if isinstance(caption_data, bytes):
-        encodings_to_try = ["utf-8", "latin-1", "cp1252"]
-        for encoding in encodings_to_try:
-            try:
-                decoded = caption_data.decode(encoding, errors="strict")
-                if decoded:
-                    return decoded.replace("\x00", "").strip()
-            except UnicodeDecodeError:
-                continue
-        return caption_data.decode("utf-8", errors="replace").replace("\ufffd", "").strip()
+        if isinstance(caption, str):
+            return caption.encode("utf-8", errors="ignore").decode("utf-8", errors="ignore")
 
-    return str(caption_data)
+    except Exception as e:
+
+        return str(caption)
+
+    return str(caption)
+
 
 @Client.on_callback_query(filters.regex(r'^start_public'))
 async def pub_(bot, message):
