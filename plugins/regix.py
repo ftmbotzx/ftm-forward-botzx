@@ -23,20 +23,6 @@ logger.setLevel(logging.INFO)
 TEXT = Translation.TEXT
 
 def safe_decode_caption(caption) -> str:
-    if not caption:
-        return ""
-
-    try:
-        if isinstance(caption, bytes):
-            return caption.decode("utf-8", errors="ignore")
-
-        if isinstance(caption, str):
-            return caption.encode("utf-8", errors="ignore").decode("utf-8", errors="ignore")
-
-    except Exception as e:
-
-        return str(caption)
-
     return str(caption)
 
 
